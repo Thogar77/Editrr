@@ -1,7 +1,7 @@
 #pragma once
 namespace editrr {
 
-    struct EditorContext; // forward
+    struct EditorContext;
 
     struct ICommand {
         virtual ~ICommand() = default;

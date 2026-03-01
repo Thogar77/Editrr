@@ -40,7 +40,6 @@ namespace editrr {
 
     void HldbHighlighter::highlight_from(Document& doc, int start_row) {
         if (!syntax_) {
-            // Brak składni: wyczyść wszystko
             if (start_row < 0) start_row = 0;
             for (int i = start_row; i < doc.num_rows(); ++i) {
                 Row& r = doc.row(i);
@@ -72,7 +71,6 @@ namespace editrr {
         return r.hl_open_comment != old_open;
     }
 
-    // ====== Twoje update_syntax() przeniesione do serwisu ======
     void HldbHighlighter::update_syntax_(Document& doc, int idx) {
         Row& row = doc.row(idx);
 
@@ -100,7 +98,6 @@ namespace editrr {
         while (i < row.render.size()) {
             const char c = row.render[i];
 
-            // ===== single-line comment =====
             if (!in_string && !in_comment && scs_len) {
                 if (i + scs_len <= row.render.size() &&
                     std::memcmp(&row.render[i], scs, scs_len) == 0) {
@@ -109,7 +106,6 @@ namespace editrr {
                 }
             }
 
-            // ===== multi-line comments =====
             if (!in_string && mcs_len && mce_len) {
                 if (in_comment) {
                     row.hl[i] = Highlight::Comment;
@@ -135,12 +131,10 @@ namespace editrr {
                 }
             }
 
-            // ===== strings =====
             if (!in_comment) {
                 if (in_string) {
                     row.hl[i] = Highlight::String;
 
-                    // escape
                     if (c == '\\' && i + 1 < row.render.size()) {
                         row.hl[i + 1] = Highlight::String;
                         i += 2;
@@ -167,7 +161,6 @@ namespace editrr {
                 }
             }
 
-            // ===== numbers =====
             if (std::isdigit((unsigned char)c) &&
                 (prev_sep || (i > 0 && row.hl[i - 1] == Highlight::Number))) {
                 row.hl[i] = Highlight::Number;
@@ -176,7 +169,6 @@ namespace editrr {
                 continue;
             }
 
-            // ===== keywords =====
             if (prev_sep) {
                 bool matched_keyword = false;
 

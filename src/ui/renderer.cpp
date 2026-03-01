@@ -12,14 +12,23 @@ namespace editrr {
     }
 
     void Renderer::draw_rows(std::string& out, Document& doc, Viewport& vp) {
+        vp.gutter_width = vp.compute_gutter_width(doc.num_rows());
+
         for (int y = 0; y < vp.height; y++) {
             int filerow = y + vp.rowoff;
 
             if (filerow < doc.num_rows()) {
                 const Row& r = doc.row(filerow);
-
+                std::string gutter;
+                std::string line_num = std::to_string(filerow + 1);
+                int padding = vp.gutter_width - (int)line_num.size() - 2;
+                gutter.append(padding, ' ');
+                gutter += line_num + " |";
+                out += "\x1b[7m";
+                out += gutter;
+                out += "\x1b[m";
                 if (vp.coloff < (int)r.render.size()) {
-                    int len = std::min((int)r.render.size() - vp.coloff, vp.width);
+                    int len = std::min((int)r.render.size() - vp.coloff, vp.width - vp.gutter_width);
 
                     Highlight current = Highlight::Normal;
                     for (int j = 0; j < len; j++) {
@@ -109,7 +118,7 @@ namespace editrr {
         char buf[32];
         std::snprintf(buf, sizeof(buf), "\x1b[%d;%dH",
             (cur.y - vp.rowoff) + 1,
-            (cur.rx - vp.coloff) + 1);
+            (cur.rx - vp.coloff) + 1 + vp.gutter_width);
         out += buf;
         out += "\x1b[?25h";
 

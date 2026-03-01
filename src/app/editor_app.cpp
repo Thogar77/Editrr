@@ -39,7 +39,6 @@ namespace editrr {
         // highlight single row
         const bool changed = syntax->highlight_row(doc, row_idx);
 
-        // if multiline comment state changed, need to recompute following rows
         if (changed) {
             syntax->highlight_from(doc, row_idx + 1);
         }
@@ -51,7 +50,6 @@ namespace editrr {
         syntax->highlight_from(doc, 0);
     }
 
-    // ===== Cursor movement (model-based) =====
     void EditorContext::move_cursor(KeyCode code) {
         switch (code) {
         case KeyCode::ArrowLeft:
@@ -106,11 +104,9 @@ namespace editrr {
         clamp_cursor();
     }
 
-    // ===== Editing =====
     void EditorContext::insert_char(char c) {
         if (cur.y == doc.num_rows()) {
             doc.insert_row(doc.num_rows(), "");
-            // now row exists
             on_row_changed(doc.num_rows() - 1);
         }
 
@@ -132,11 +128,9 @@ namespace editrr {
         if (cur.x == 0) {
             doc.insert_row(cur.y, "");
             on_row_changed(cur.y);
-            // insertion shifts current line down; also recompute from here
             if (syntax) syntax->highlight_from(doc, cur.y);
         }
         else {
-            // split line at cursor
             Row& row = doc.row(cur.y);
 
             std::string right = row.chars.substr(cur.x);
@@ -144,10 +138,8 @@ namespace editrr {
             Document::rebuild_render(row);
             doc.set_dirty(true);
 
-            // insert right part as new row
             doc.insert_row(cur.y + 1, right);
 
-            // syntax: current row changed and new row added
             on_row_changed(cur.y);
             on_row_changed(cur.y + 1);
             if (syntax) syntax->highlight_from(doc, cur.y + 1);
@@ -206,7 +198,6 @@ namespace editrr {
         }
     }
 
-    // ===== App =====
     void EditorApp::init_terminal(EditorContext& ctx) {
         int rows, cols;
         if (get_window_size(rows, cols) == -1) std::exit(1);
@@ -243,7 +234,6 @@ namespace editrr {
 
             std::string err;
             if (ctx.file.save(ctx.doc, path, err)) {
-                // filename might have changed (Save as) -> syntax selection may change too
                 ctx.rehighlight_all();
                 ctx.set_status("%zu bytes written", ctx.doc.to_string().size());
             }
@@ -288,14 +278,12 @@ namespace editrr {
             return;
         }
 
-        // Enter newline
         if (k.code == KeyCode::Enter) {
             ctx.insert_newline();
             ctx.quit_times = 3;
             return;
         }
 
-        // everything else: map to command (move/insert/delete)
         if (auto cmd = dispatcher_.map_key_to_command(k)) {
             cmd->execute(ctx);
         }
@@ -321,18 +309,18 @@ namespace editrr {
                 ctx.set_status("Can't open: %s", err.c_str());
             }
             else {
-                // after open -> choose syntax & highlight all
                 ctx.rehighlight_all();
             }
         }
         else {
-            // optional: start with empty doc
-            // ctx.doc.insert_row(0, "");
-            // ctx.on_row_changed(0);
             ctx.rehighlight_all();
         }
 
         while (ctx.running) {
+            int rows, cols;
+            if (get_window_size(rows, cols) == -1) std::exit(1);
+            ctx.vp.height = rows;
+            ctx.vp.width = cols;
             renderer_.refresh(ctx.doc, ctx.cur, ctx.vp, ctx.status, ctx.doc.filename(), ctx.doc.dirty());
             Key k = input_.read_key();
             process_key(ctx, k);

@@ -44,7 +44,7 @@ namespace editor {
         if (filename_.size() >= extlen &&
           filename_.compare(filename_.size() - extlen, extlen, ext) == 0) {
           syntax_ = &s;
-          update_syntax_from_(0); // policz wszystko od nowa
+          update_syntax_from_(0);
           return;
         }
       }
@@ -192,7 +192,6 @@ namespace editor {
       break;
     }
 
-    // jeśli user nacisnął coś innego niż Ctrl-Q, resetujemy licznik
     quit_times = QUIT_TIMES;
   }
 
@@ -200,7 +199,7 @@ namespace editor {
     if (s.empty()) return;
     row.chars += s;
 
-    const int idx = (int)(&row - &buffer_.rows[0]); // tylko jeśli row pochodzi z buffer_.rows
+    const int idx = (int)(&row - &buffer_.rows[0]);
     update_row(idx);
 
     dirty_ = true;
@@ -242,7 +241,6 @@ namespace editor {
             out.push_back(r.render[idx]);
           }
 
-          // reset na koniec linii
           if (current != Highlight::Normal) out += "\x1b[39m";
         }
       }
@@ -262,7 +260,6 @@ namespace editor {
       }
 
       out += "\x1b[K";
-      // if (y < height_ - 1) 
       out += "\r\n";
     }
   }
@@ -293,7 +290,6 @@ namespace editor {
     while (i < row.render.size()) {
       char c = row.render[i];
 
-      // ===== single-line comment (// ...) =====
       if (!in_string && !in_comment && scs_len) {
         if (i + scs_len <= row.render.size() &&
           std::memcmp(&row.render[i], scs, scs_len) == 0) {
@@ -302,7 +298,6 @@ namespace editor {
         }
       }
 
-      // ===== multi-line comments (/* ... */) =====
       if (!in_string && mcs_len && mce_len) {
         if (in_comment) {
           row.hl[i] = Highlight::Comment;
@@ -328,12 +323,10 @@ namespace editor {
         }
       }
 
-      // ===== strings ("..." / '...') =====
       if (!in_comment) {
         if (in_string) {
           row.hl[i] = Highlight::String;
 
-          // escape: \" albo \'
           if (c == '\\' && i + 1 < row.render.size()) {
             row.hl[i + 1] = Highlight::String;
             i += 2;
@@ -360,7 +353,6 @@ namespace editor {
         }
       }
 
-      // ===== numbers =====
       if (std::isdigit((unsigned char)c) &&
         (prev_sep || (i > 0 && row.hl[i - 1] == Highlight::Number))) {
         row.hl[i] = Highlight::Number;
@@ -369,7 +361,6 @@ namespace editor {
         continue;
       }
 
-      // ===== keywords =====
       if (prev_sep) {
         bool matched_keyword = false;
 
@@ -399,10 +390,9 @@ namespace editor {
           }
         }
 
-        if (matched_keyword) continue;  // <-- kluczowe: nie robimy i++ poniżej
+        if (matched_keyword) continue;
       }
 
-      // ===== default =====
       prev_sep = is_separator((unsigned char)c);
       i++;
     }
@@ -475,11 +465,9 @@ namespace editor {
       cursor.rx = cx_to_rx_(buffer_.rows[cursor.y], cursor.x);
     }
 
-    // vertical
     if (cursor.y < rowoff_) rowoff_ = cursor.y;
     if (cursor.y >= rowoff_ + height_) rowoff_ = cursor.y - height_ + 1;
 
-    // horizontal (po rx)
     if (cursor.rx < coloff_) coloff_ = cursor.rx;
     if (cursor.rx >= coloff_ + width_) coloff_ = cursor.rx - width_ + 1;
   }
@@ -546,7 +534,6 @@ namespace editor {
       return;
     }
 
-    // zwykły backspace w środku linii
     row_del_char(buffer_.rows[cursor.y], cursor.x - 1);
     cursor.x--;
   }
@@ -612,19 +599,16 @@ namespace editor {
 
       const int c = read_key();
 
-      // Backspace / Delete / Ctrl-H
       if (c == BACKSPACE || c == DELETE_KEY || c == CTRL_KEY('h')) {
         if (!buf.empty()) buf.pop_back();
         continue;
       }
 
-      // ESC -> cancel
       if (c == KEY_ESC) {
         set_status_message("");
         return std::nullopt;
       }
 
-      // Enter -> accept (jak niepuste)
       if (c == ENTER) {
         if (!buf.empty()) {
           set_status_message("");
@@ -633,7 +617,6 @@ namespace editor {
         continue;
       }
 
-      // zwykłe znaki drukowalne
       if (c >= 32 && c <= 126) {
         buf.push_back((char)c);
         continue;

@@ -33,15 +33,23 @@ namespace editrr {
         if (cur.x > rowlen) cur.x = rowlen;
     }
 
+    int Viewport::compute_gutter_width(int num_rows) {
+        int digits = 1;
+        int max = 10;
+        while (num_rows >= max) {
+            digits++;
+            max *= 10;
+        }
+        return digits + 2;
+    }
+
     void Viewport::scroll(Document& doc, Cursor& cur) {
         cur.rx = 0;
         if (cur.y < doc.num_rows()) cur.rx = cx_to_rx(doc.row(cur.y), cur.x);
 
-        // vertical
         if (cur.y < rowoff) rowoff = cur.y;
         if (cur.y >= rowoff + height) rowoff = cur.y - height + 1;
 
-        // horizontal
         if (cur.rx < coloff) coloff = cur.rx;
         if (cur.rx >= coloff + width) coloff = cur.rx - width + 1;
     }

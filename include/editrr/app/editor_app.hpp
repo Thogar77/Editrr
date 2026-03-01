@@ -10,7 +10,6 @@
 #include "editrr/services/search_service.hpp"
 #include "editrr/services/prompt_service.hpp"
 
-// Syntax Strategy/Factory
 #include "editrr/services/syntax/syntax.hpp"
 
 #include <memory>
@@ -19,7 +18,6 @@
 namespace editrr {
 
     struct EditorContext {
-        // ===== state =====
         Document doc;
         Cursor cur;
         Viewport vp;
@@ -27,24 +25,19 @@ namespace editrr {
 
         bool running{ true };
 
-        // find state
         int find_last_match{ -1 };
         int find_direction{ 1 };
 
-        // quit protection
         int quit_times{ 3 };
 
-        // ===== services =====
         FileService file;
         SearchService search;
         PromptService prompt;
         std::unique_ptr<ISyntaxHighlighter> syntax;
 
-        // ===== ui & input pointers =====
         InputReader* input{ nullptr };
         Renderer* renderer{ nullptr };
 
-        // ===== operations used by commands / app =====
         void set_status(const char* fmt, ...);
 
         void clamp_cursor();
@@ -54,13 +47,10 @@ namespace editrr {
         void insert_char(char c);
         void insert_newline();
 
-        // delete_key=false => backspace, true => delete at cursor
         void delete_char(bool delete_key);
 
-        // helper: recompute syntax for row and maybe propagate
         void on_row_changed(int row_idx);
 
-        // helper: recompute syntax for whole doc (after open/save-as)
         void rehighlight_all();
     };
 

@@ -16,8 +16,8 @@ namespace editrr {
     };
 
     struct Row {
-        std::string chars;   // raw text
-        std::string render;  // expanded tabs
+        std::string chars;
+        std::string render;
         std::vector<Highlight> hl;
         bool hl_open_comment{ false };
 

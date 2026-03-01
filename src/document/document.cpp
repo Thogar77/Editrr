@@ -15,7 +15,6 @@ namespace editrr {
                 r.render.push_back(ch);
             }
         }
-        // highlight: tutaj na razie czyścimy, później podłączysz Strategy
         r.hl.assign(r.render.size(), Highlight::Normal);
         r.hl_open_comment = false;
     }

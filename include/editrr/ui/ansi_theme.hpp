@@ -6,11 +6,11 @@ namespace editrr {
 
     inline std::string hl_to_color(Highlight h) {
         switch (h) {
-        case Highlight::Number: return "31";   // red
-        case Highlight::String: return "32";   // green
-        case Highlight::Comment:return "90";   // gray
-        case Highlight::Keyword1:return "34";  // blue
-        case Highlight::Keyword2:return "35";  // magenta
+        case Highlight::Number: return "31";
+        case Highlight::String: return "32";
+        case Highlight::Comment:return "90";
+        case Highlight::Keyword1:return "34";
+        case Highlight::Keyword2:return "35";
         default: return "39";
         }
     }

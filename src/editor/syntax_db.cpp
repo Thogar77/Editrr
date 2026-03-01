@@ -1,6 +1,5 @@
 #include "editrr/syntax_db.hpp"
 
-// Minimalny HLDB (C/C++). Możesz potem rozbudować.
 static const char* C_CPP_MATCH[] = {
   ".c", ".h", ".cpp", ".hpp", ".cc", ".hh", nullptr
 };

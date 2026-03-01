@@ -8,7 +8,6 @@ namespace editrr {
 
     class SearchService {
     public:
-        // znajdź następne wystąpienie query, aktualizuje cursor/viewport; zwraca true jeśli znalazł
         bool find_next(Document& doc, Cursor& cur, Viewport& vp,
             const std::string& query, int& last_match, int& direction);
     };

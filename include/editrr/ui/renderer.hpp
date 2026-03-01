@@ -15,6 +15,7 @@ namespace editrr {
             bool dirty);
 
     private:
+        
         void draw_rows(std::string& out, Document& doc, Viewport& vp);
         void draw_status_bar(std::string& out, Document& doc, Cursor& cur,
             Viewport& vp, const std::string& filename, bool dirty);

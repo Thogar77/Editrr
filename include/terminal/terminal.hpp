@@ -7,10 +7,9 @@
 
 #include "terminal/flags.hpp"
 class Terminal {
- public:
+public:
   Terminal();
   ~Terminal();
-  // Terminal(std::initializer_list<TerminalFlag> flags);
 
   void apply();
   void die(const std::string error_code);
@@ -33,6 +32,6 @@ class Terminal {
     apply();
   };
 
- private:
+private:
   termios orig, raw;
 };

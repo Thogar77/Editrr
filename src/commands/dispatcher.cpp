@@ -1,10 +1,9 @@
 #include "editrr/commands/dispatcher.hpp"
-#include "editrr/app/editor_app.hpp" // for ctx and commands
+#include "editrr/app/editor_app.hpp"
 #include <memory>
 
 namespace editrr {
 
-    // Komendy jako małe klasy w .cpp (możesz je przenieść do osobnych plików)
     struct MoveCursorCmd : ICommand {
         KeyCode dir;
         explicit MoveCursorCmd(KeyCode d) : dir(d) {}
@@ -18,7 +17,7 @@ namespace editrr {
     };
 
     struct DeleteCharCmd : ICommand {
-        bool del_key; // jeśli DeleteKey vs Backspace
+        bool del_key;
         explicit DeleteCharCmd(bool dk) : del_key(dk) {}
         void execute(EditorContext& ctx) override;
     };
@@ -39,7 +38,6 @@ namespace editrr {
         return {};
     }
 
-    // Implementacje komend (korzystają z API EditorContext)
     void MoveCursorCmd::execute(EditorContext& ctx) { ctx.move_cursor(dir); }
     void InsertCharCmd::execute(EditorContext& ctx) { ctx.insert_char(c); }
     void DeleteCharCmd::execute(EditorContext& ctx) { ctx.delete_char(del_key); }

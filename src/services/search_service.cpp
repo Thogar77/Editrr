@@ -18,7 +18,7 @@ namespace editrr {
                 last_match = current;
                 cur.y = current;
                 cur.x = vp.rx_to_cx(row, (int)pos);
-                vp.rowoff = doc.num_rows(); // “wymuś scroll”
+                vp.rowoff = doc.num_rows();
                 return true;
             }
         }
