@@ -1,27 +1,21 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include <vector>
 
 namespace editrr {
 
-    constexpr int TABSTOP = 8;
+constexpr int TABSTOP = 8;
 
-    enum class Highlight : uint8_t {
-        Normal = 0,
-        Number,
-        String,
-        Comment,
-        Keyword1,
-        Keyword2
-    };
+enum class Highlight : uint8_t { Normal = 0, Number, String, Comment, Keyword1, Keyword2 };
 
-    struct Row {
-        std::string chars;
-        std::string render;
-        std::vector<Highlight> hl;
-        bool hl_open_comment{ false };
+struct Row {
+  std::string chars;
+  std::string render;
+  std::vector<Highlight> hl;
+  bool hl_open_comment{false};
 
-        int size() const { return (int)chars.size(); }
-    };
+  int size() const { return (int)chars.size(); }
+};
 
-} // namespace editrr
+}  // namespace editrr

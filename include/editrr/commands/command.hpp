@@ -1,11 +1,12 @@
 #pragma once
 namespace editrr {
 
-    struct EditorContext;
+struct EditorState;
+struct EditorServices;
 
-    struct ICommand {
-        virtual ~ICommand() = default;
-        virtual void execute(EditorContext& ctx) = 0;
-    };
+struct ICommand {
+  virtual ~ICommand() = default;
+  virtual void execute(EditorState& state, EditorServices& srv) = 0;
+};
 
-} // namespace editrr
+}  // namespace editrr
