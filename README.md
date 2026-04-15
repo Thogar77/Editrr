@@ -16,7 +16,7 @@ A CLI text editor written in C++, inspired by the kilo text editor. This project
 - C++17 or later
 - CMake 3.16 or later
 - Conan package manager
-- Pixi environment manager (optional, for Python-based tooling)
+- Pixi environment manager
 
 ## Installation
 
@@ -26,26 +26,21 @@ A CLI text editor written in C++, inspired by the kilo text editor. This project
    cd Editrr
    ```
 
-2. Install dependencies using Conan:
-   ```bash
-   conan install . --build=missing
-   ```
-
-3. (Optional) Set up the environment with Pixi:
+2. Set up the environment with Pixi:
    ```bash
    pixi install
    ```
 
 ## Building
 
-1. Configure the project with CMake:
+1. Install dependencies with Pixi:
    ```bash
-   cmake -S . -B build
+   pixi run build-conan
    ```
 
 2. Build the project:
    ```bash
-   cmake --build build
+   pixi run build-all
    ```
 
 ## Running
