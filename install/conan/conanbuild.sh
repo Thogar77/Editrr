@@ -1,1 +1,0 @@
-. "/home/jakub/KursCPP/Projekt/install/conan/conanbuildenv-release-x86_64.sh"
