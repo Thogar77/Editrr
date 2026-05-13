@@ -1,45 +1,58 @@
 #include "editrr/services/file_service.hpp"
-#include <fstream>
+
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <algorithm>
 #include <cerrno>
 #include <cstring>
+#include <fstream>
 
 namespace editrr {
 
-    bool FileService::open(Document& doc, const std::string& path, std::string& err) {
-        std::ifstream in(path);
-        if (!in) { err = "open_file: " + std::string(std::strerror(errno)); return false; }
+bool FileService::open(Document& doc, const std::string& path, std::string& err) {
+  std::ifstream in(path);
+  if (!in) {
+    err = "open_file: " + std::string(std::strerror(errno));
+    return false;
+  }
 
-        doc.rows().clear();
-        doc.set_filename(path);
+  std::string content{std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>()};
 
-        std::string line;
-        while (std::getline(in, line)) {
-            if (!line.empty() && line.back() == '\r') line.pop_back();
-            doc.insert_row(doc.num_rows(), line);
-        }
+  content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
 
-        doc.set_dirty(false);
-        return true;
-    }
+  doc.load_from_string(content);
+  doc.set_filename(path);
 
-    bool FileService::save(Document& doc, const std::string& path, std::string& err) {
-        const std::string data = doc.to_string();
+  return true;
+}
 
-        int fd = ::open(path.c_str(), O_RDWR | O_CREAT, 0644);
-        if (fd == -1) { err = std::strerror(errno); return false; }
+bool FileService::save(Document& doc, const std::string& path, std::string& err) {
+  const std::string data = doc.to_string();
 
-        if (::ftruncate(fd, (off_t)data.size()) == -1) { ::close(fd); err = std::strerror(errno); return false; }
+  int fd = ::open(path.c_str(), O_RDWR | O_CREAT, 0644);
+  if (fd == -1) {
+    err = std::strerror(errno);
+    return false;
+  }
 
-        ssize_t written = ::write(fd, data.data(), data.size());
-        ::close(fd);
+  if (::ftruncate(fd, (off_t)data.size()) == -1) {
+    ::close(fd);
+    err = std::strerror(errno);
+    return false;
+  }
 
-        if (written != (ssize_t)data.size()) { err = std::strerror(errno); return false; }
+  ssize_t written = ::write(fd, data.data(), data.size());
+  ::close(fd);
 
-        doc.set_filename(path);
-        doc.set_dirty(false);
-        return true;
-    }
+  if (written != (ssize_t)data.size()) {
+    err = std::strerror(errno);
+    return false;
+  }
 
-} // namespace editrr
+  doc.set_filename(path);
+  doc.set_dirty(false);
+  return true;
+}
+
+}  // namespace editrr

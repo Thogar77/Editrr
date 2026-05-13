@@ -57,15 +57,15 @@ void EditorState::move_cursor(KeyCode code) {
         cur.x--;
       } else if (cur.y > 0) {
         cur.y--;
-        cur.x = (int)doc.row(cur.y).chars.size();
+        cur.x = (int)doc.row(cur.y).length;
       }
       break;
 
     case KeyCode::ArrowRight:
       if (cur.y == doc.num_rows()) break;
-      if (cur.x < (int)doc.row(cur.y).chars.size()) {
+      if (cur.x < (int)doc.row(cur.y).length) {
         cur.x++;
-      } else if (cur.x == (int)doc.row(cur.y).chars.size() && cur.y < doc.num_rows() - 1) {
+      } else if (cur.x == (int)doc.row(cur.y).length && cur.y < doc.num_rows() - 1) {
         cur.y++;
         cur.x = 0;
       }
@@ -92,7 +92,7 @@ void EditorState::move_cursor(KeyCode code) {
       break;
 
     case KeyCode::End:
-      cur.x = (cur.y < doc.num_rows()) ? (int)doc.row(cur.y).chars.size() : 0;
+      cur.x = (cur.y < doc.num_rows()) ? (int)doc.row(cur.y).length : 0;
       break;
 
     default:
@@ -130,7 +130,7 @@ void EditorState::insert_newline() {
   } else {
     Row& row = doc.row(cur.y);
 
-    std::string right = row.chars.substr(cur.x);
+    std::string right = doc.row_text(cur.y).substr(cur.x);
     row.chars.erase(cur.x);
     Document::rebuild_render(row);
     doc.set_dirty(true);
@@ -155,10 +155,10 @@ void EditorState::delete_char(bool delete_key) {
     if (cur.x == 0) {
       if (cur.y == 0) return;
 
-      int prev_len = (int)doc.row(cur.y - 1).chars.size();
+      int prev_len = (int)doc.row(cur.y - 1).lenght;
 
       // join current into previous
-      doc.row_append_string(cur.y - 1, doc.row(cur.y).chars);
+      doc.row_append_string(cur.y - 1, doc.row_text(cur.y));
       doc.delete_row(cur.y);
 
       cur.y--;
@@ -179,13 +179,13 @@ void EditorState::delete_char(bool delete_key) {
 
   // DELETE key (delete at cursor)
   Row& row = doc.row(cur.y);
-  if (cur.x < (int)row.chars.size()) {
+  if (cur.x < (int)row.length) {
     doc.row_delete_char(cur.y, cur.x);
     on_row_changed(cur.y);
   } else {
     // at end -> join with next row
     if (cur.y < doc.num_rows() - 1) {
-      doc.row_append_string(cur.y, doc.row(cur.y + 1).chars);
+      doc.row_append_string(cur.y, doc.row_text(cur.y + 1));
       doc.delete_row(cur.y + 1);
 
       on_row_changed(cur.y);
