@@ -5,3 +5,6 @@ logs/
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+# Bazel
+bazel-*

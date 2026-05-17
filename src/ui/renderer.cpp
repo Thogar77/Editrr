@@ -22,7 +22,6 @@ void Renderer::draw_rows(std::string& out, Document& doc, Viewport& vp) {
     if (filerow < doc.num_rows()) {
       Row& r = doc.row(filerow);
 
-      if (!r.dirty) continue;
       std::string gutter;
       std::string line_num = std::to_string(filerow + 1);
       int padding = vp.gutter_width - (int)line_num.size() - 2;

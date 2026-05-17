@@ -34,17 +34,17 @@ void EditorState::set_status(const char* fmt, ...) {
 void EditorState::clamp_cursor() { vp.clamp_cursor(doc, cur); }
 
 void EditorState::on_row_changed(int row_idx) {
+  if (row_idx < 0 || row_idx >= doc.num_rows()) return;
+  Document::rebuild_render(doc.row(row_idx), doc.row_text(row_idx));
+
   if (!syntax) return;
-
-  // highlight single row
   const bool changed = syntax->highlight_row(doc, row_idx);
-
-  if (changed) {
-    syntax->highlight_from(doc, row_idx + 1);
-  }
+  if (changed) syntax->highlight_from(doc, row_idx + 1);
 }
 
 void EditorState::rehighlight_all() {
+  for (int i = 0; i < doc.num_rows(); ++i)
+    Document::rebuild_render(doc.row(i), doc.row_text(i));
   if (!syntax) return;
   syntax->set_filename(doc.filename());
   syntax->highlight_from(doc, 0);
@@ -128,15 +128,7 @@ void EditorState::insert_newline() {
     on_row_changed(cur.y);
     if (syntax) syntax->highlight_from(doc, cur.y);
   } else {
-    Row& row = doc.row(cur.y);
-
-    std::string right = doc.row_text(cur.y).substr(cur.x);
-    row.chars.erase(cur.x);
-    Document::rebuild_render(row);
-    doc.set_dirty(true);
-
-    doc.insert_row(cur.y + 1, right);
-
+    doc.split_row(cur.y, cur.x);
     on_row_changed(cur.y);
     on_row_changed(cur.y + 1);
     if (syntax) syntax->highlight_from(doc, cur.y + 1);
@@ -155,7 +147,7 @@ void EditorState::delete_char(bool delete_key) {
     if (cur.x == 0) {
       if (cur.y == 0) return;
 
-      int prev_len = (int)doc.row(cur.y - 1).lenght;
+      int prev_len = (int)doc.row(cur.y - 1).length;
 
       // join current into previous
       doc.row_append_string(cur.y - 1, doc.row_text(cur.y));

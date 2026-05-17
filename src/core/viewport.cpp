@@ -31,7 +31,7 @@ void Viewport::clamp_cursor(Document& doc, Cursor& cur) const {
   if (cur.y > doc.num_rows()) cur.y = doc.num_rows();
 
   int rowlen = 0;
-  if (cur.y < doc.num_rows()) rowlen = (int)doc.row(cur.y).lenght;
+  if (cur.y < doc.num_rows()) rowlen = (int)doc.row(cur.y).length;
 
   if (cur.x < 0) cur.x = 0;
   if (cur.x > rowlen) cur.x = rowlen;

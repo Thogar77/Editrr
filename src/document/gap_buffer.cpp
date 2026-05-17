@@ -50,7 +50,7 @@ char GapBuffer::at(size_t pos) const {
 
 std::string GapBuffer::to_string() const {
   std::string result;
-  result.reserve(size());
+  result.resize(size());
   memmove(&result[0], &buf_[0], gap_start_);
   memmove(&result[gap_start_], &buf_[gap_end_], buf_.size() - gap_end_);
   return result;
@@ -59,11 +59,8 @@ std::string GapBuffer::to_string() const {
 std::string GapBuffer::substr(size_t pos, size_t len) const {
   std::string result;
   result.reserve(len);
-  memmove(&result[0], &buf_[0], std::min(len, gap_start_ - pos));
-  if (pos + len > gap_start_) {
-    memmove(&result[gap_start_ - pos], &buf_[gap_end_],
-            std::min(len - (gap_start_ - pos), buf_.size() - gap_end_));
-  }
+  for (size_t i = pos; i < pos + len && i < size(); ++i)
+    result.push_back(at(i));
   return result;
 }
 
