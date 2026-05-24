@@ -34,17 +34,17 @@ void EditorState::set_status(const char* fmt, ...) {
 void EditorState::clamp_cursor() { vp.clamp_cursor(doc, cur); }
 
 void EditorState::on_row_changed(int row_idx) {
+  if (row_idx < 0 || row_idx >= doc.num_rows()) return;
+  Document::rebuild_render(doc.row(row_idx), doc.row_text(row_idx));
+
   if (!syntax) return;
-
-  // highlight single row
   const bool changed = syntax->highlight_row(doc, row_idx);
-
-  if (changed) {
-    syntax->highlight_from(doc, row_idx + 1);
-  }
+  if (changed) syntax->highlight_from(doc, row_idx + 1);
 }
 
 void EditorState::rehighlight_all() {
+  for (int i = 0; i < doc.num_rows(); ++i)
+    Document::rebuild_render(doc.row(i), doc.row_text(i));
   if (!syntax) return;
   syntax->set_filename(doc.filename());
   syntax->highlight_from(doc, 0);
@@ -57,15 +57,15 @@ void EditorState::move_cursor(KeyCode code) {
         cur.x--;
       } else if (cur.y > 0) {
         cur.y--;
-        cur.x = (int)doc.row(cur.y).chars.size();
+        cur.x = (int)doc.row(cur.y).length;
       }
       break;
 
     case KeyCode::ArrowRight:
       if (cur.y == doc.num_rows()) break;
-      if (cur.x < (int)doc.row(cur.y).chars.size()) {
+      if (cur.x < (int)doc.row(cur.y).length) {
         cur.x++;
-      } else if (cur.x == (int)doc.row(cur.y).chars.size() && cur.y < doc.num_rows() - 1) {
+      } else if (cur.x == (int)doc.row(cur.y).length && cur.y < doc.num_rows() - 1) {
         cur.y++;
         cur.x = 0;
       }
@@ -92,7 +92,7 @@ void EditorState::move_cursor(KeyCode code) {
       break;
 
     case KeyCode::End:
-      cur.x = (cur.y < doc.num_rows()) ? (int)doc.row(cur.y).chars.size() : 0;
+      cur.x = (cur.y < doc.num_rows()) ? (int)doc.row(cur.y).length : 0;
       break;
 
     default:
@@ -128,15 +128,7 @@ void EditorState::insert_newline() {
     on_row_changed(cur.y);
     if (syntax) syntax->highlight_from(doc, cur.y);
   } else {
-    Row& row = doc.row(cur.y);
-
-    std::string right = row.chars.substr(cur.x);
-    row.chars.erase(cur.x);
-    Document::rebuild_render(row);
-    doc.set_dirty(true);
-
-    doc.insert_row(cur.y + 1, right);
-
+    doc.split_row(cur.y, cur.x);
     on_row_changed(cur.y);
     on_row_changed(cur.y + 1);
     if (syntax) syntax->highlight_from(doc, cur.y + 1);
@@ -155,10 +147,10 @@ void EditorState::delete_char(bool delete_key) {
     if (cur.x == 0) {
       if (cur.y == 0) return;
 
-      int prev_len = (int)doc.row(cur.y - 1).chars.size();
+      int prev_len = (int)doc.row(cur.y - 1).length;
 
       // join current into previous
-      doc.row_append_string(cur.y - 1, doc.row(cur.y).chars);
+      doc.row_append_string(cur.y - 1, doc.row_text(cur.y));
       doc.delete_row(cur.y);
 
       cur.y--;
@@ -179,13 +171,13 @@ void EditorState::delete_char(bool delete_key) {
 
   // DELETE key (delete at cursor)
   Row& row = doc.row(cur.y);
-  if (cur.x < (int)row.chars.size()) {
+  if (cur.x < (int)row.length) {
     doc.row_delete_char(cur.y, cur.x);
     on_row_changed(cur.y);
   } else {
     // at end -> join with next row
     if (cur.y < doc.num_rows() - 1) {
-      doc.row_append_string(cur.y, doc.row(cur.y + 1).chars);
+      doc.row_append_string(cur.y, doc.row_text(cur.y + 1));
       doc.delete_row(cur.y + 1);
 
       on_row_changed(cur.y);

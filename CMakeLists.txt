@@ -27,6 +27,7 @@ add_executable(editrr
   src/core/viewport.cpp
 
   src/document/document.cpp
+  src/document/gap_buffer.cpp
 
   src/input/input_reader.cpp
 
