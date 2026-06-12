@@ -10,12 +10,12 @@
 
 #include "ISerializer.hpp"
 #include "toml++/impl/table.hpp"
-
+namespace serializer {
 class TomlSerializer : ISerializer {
  public:
   TomlSerializer();
-  virtual ~TomlSerializer();
-  void serialize(const toml::table data, const std::filesystem::path& file_path) override;
+  virtual ~TomlSerializer() = default;
+  void serialize(const toml::table& data, const std::filesystem::path& file_path) override;
 };
-
+}  // namespace serializer
 #endif  // EDITRR_TOML_SERIALIZER_H

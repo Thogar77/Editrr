@@ -6,8 +6,8 @@ logs/
 # pixi environments
 .pixi/*
 !.pixi/config.toml
-
 bazel*
 
 # Conan
 .conan/
+install/
