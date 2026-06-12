@@ -7,9 +7,16 @@ version = "0.1.0"
 
 [tasks]
 build-conan = "CMAKE_POLICY_VERSION_MINIMUM=3.5 conan install conanfile.py --build missing --output-folder install/conan --deployer=full_deploy --deployer-folder install/conan/deploy"
+build-conan-debug = "CMAKE_POLICY_VERSION_MINIMUM=3.5 conan install conanfile.py --build missing --output-folder install/conan -s build_type=Debug --deployer=full_deploy --deployer-folder install/conan/deploy"
 
 [tasks.build-all]
 cmd = "bash -c 'source install/conan/build/Release/generators/conanbuild.sh && cmake --preset conan-release && cmake --build install/conan/build/Release'"
+
+[tasks.compile-commands]
+cmd = "bash -c 'source install/conan/build/Release/generators/conanbuild.sh && cmake --preset conan-release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && cp install/conan/build/Release/compile_commands.json .'"
+
+[tasks.build-debug]
+cmd = "bash -c 'source install/conan/build/Debug/generators/conanbuild.sh && cmake --preset conan-debug && cmake --build install/conan/build/Debug'"
 
 [dependencies]
 conan = ">=2.26.1,<3"

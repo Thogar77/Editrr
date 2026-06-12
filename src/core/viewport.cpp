@@ -1,5 +1,6 @@
 #include "editrr/core/viewport.hpp"
 
+#include "editrr/config/parser/parser.hpp"
 namespace editrr {
 
 int Viewport::cx_to_rx(std::string_view chars, int cx) const {

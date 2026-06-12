@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editrr — Roadmap</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222534;
+      --border: #2e3347;
+      --accent: #7c6af7;
+      --accent2: #4ecdc4;
+      --done: #3ecf8e;
+      --warn: #f7c948;
+      --text: #e2e4f0;
+      --muted: #6b7280;
+      --hint-bg: #1e2235;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+    }
+
+    header span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .global-progress {
+      padding: 20px 24px 4px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .global-progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .global-progress-label strong {
+      color: var(--done);
+      font-size: 15px;
+    }
+
+    .bar-track {
+      background: var(--border);
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.4s ease;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .category {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+      background: var(--surface2);
+    }
+
+    .category-header:hover { background: #272a3d; }
+
+    .category-header .icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .category-header .cat-title {
+      font-weight: 600;
+      font-size: 15px;
+      flex: 1;
+    }
+
+    .cat-progress {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .cat-percent {
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .mini-bar {
+      width: 80px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-left: 10px;
+    }
+
+    .mini-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+      transition: width 0.4s ease;
+    }
+
+    .chevron {
+      color: var(--muted);
+      font-size: 12px;
+      transition: transform 0.2s;
+      margin-left: 8px;
+    }
+
+    .category.open .chevron { transform: rotate(90deg); }
+
+    .items {
+      display: none;
+      flex-direction: column;
+    }
+
+    .category.open .items { display: flex; }
+
+    .item {
+      border-top: 1px solid var(--border);
+      padding: 12px 18px;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .item-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      cursor: pointer;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .item-check.checked {
+      background: var(--done);
+      border-color: var(--done);
+    }
+
+    .item-check.checked::after {
+      content: '✓';
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .item-body { flex: 1; }
+
+    .item-title {
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .item-title.checked-label {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .item-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .hint-toggle {
+      font-size: 11px;
+      color: var(--accent);
+      cursor: pointer;
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.8;
+    }
+
+    .hint-toggle:hover { opacity: 1; }
+
+    .hint-box {
+      display: none;
+      background: var(--hint-bg);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #a9afc7;
+      line-height: 1.7;
+    }
+
+    .hint-box.visible { display: block; }
+
+    .hint-box a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+    .hint-box a:hover { text-decoration: underline; }
+
+    .hint-box code {
+      background: #2a2f48;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--warn);
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-hard { background: #3d1f1f; color: #f87171; }
+    .tag-medium { background: #3d3010; color: #f7c948; }
+    .tag-easy { background: #0f3020; color: #3ecf8e; }
+
+    @media (max-width: 600px) {
+      header { padding: 12px 16px; }
+      main { padding: 16px 12px 60px; }
+      .item { padding: 10px 12px; }
+      .category-header { padding: 12px 14px; }
+      .mini-bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Editrr Roadmap</h1>
+  <span id="header-progress">Ładowanie...</span>
+</header>
+
+<div class="global-progress">
+  <div class="global-progress-label">
+    <span>Łączny postęp</span>
+    <strong id="global-percent">0%</strong>
+  </div>
+  <div class="bar-track">
+    <div class="bar-fill" id="global-bar" style="width:0%"></div>
+  </div>
+</div>
+
+<main id="app"></main>
+
+<script>
+// ─── Dane ────────────────────────────────────────────────────────────────────
+
+const ROADMAP = [
+  {
+    id: "gap_buffer",
+    icon: "🔲",
+    title: "Gap Buffer",
+    items: [
+      {
+        id: "gap_buffer_core",
+        title: "Podstawowa implementacja gap buffera",
+        desc: "Struktura danych z dziurą dla efektywnych edycji w środku tekstu.",
+        done: true,
+        hint: `Gap buffer trzyma tekst jako tablicę z dziurą (gap) przesuwaną do kursora przed każdą edycją.
+Operacje insert/delete są O(1) amortyzowane.<br><br>
+📖 <a href="https://en.wikipedia.org/wiki/Gap_buffer" target="_blank">Wikipedia – Gap buffer</a><br>
+📖 <a href="https://codemirror.net/5/doc/internals.html" target="_blank">CodeMirror internals – opis buforów tekstowych</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "gap_buffer_unicode",
+        title: "Wsparcie dla Unicode (UTF-8)",
+        desc: "Poprawna obsługa wielobajtowych znaków przy przesuwaniu kursora i wycinaniu tekstu.",
+        done: false,
+        hint: `W UTF-8 jeden znak to 1–4 bajty. Kursor powinien operować na <em>code pointach</em>, nie bajtach.<br><br>
+Pomocne: <code>std::u8string</code> (C++20), biblioteka <a href="https://github.com/sheredom/utf8.h" target="_blank">utf8.h</a> (header-only).<br>
+📖 <a href="https://utf8everywhere.org/" target="_blank">UTF-8 Everywhere Manifesto</a>`,
+        difficulty: "hard"
+      },
+      {
+        id: "gap_buffer_undo",
+        title: "Historia edycji (Undo/Redo)",
+        desc: "Stack operacji z możliwością cofania i ponawiania zmian.",
+        done: false,
+        hint: `Klasyczne podejście: Command Pattern — każda edycja to obiekt z metodami <code>apply()</code> i <code>undo()</code>.<br>
+Bardziej zaawansowane: piece table lub piece tree (jak w VS Code).<br><br>
+📖 <a href="https://code.visualstudio.com/blogs/2018/03/23/text-buffer-reimplementation" target="_blank">VS Code – Text Buffer Reimplementation (piece tree)</a><br>
+📖 <a href="https://www.cs.unm.edu/~crowley/papers/sds.pdf" target="_blank">Data Structures for Text Sequences (Crowley)</a>`,
+        difficulty: "medium"
+      }
+    ]
+  },
+  {
+    id: "ui",
+    icon: "🖥️",
+    title: "UI – Komponenty interfejsu",
+    items: [
+      {
+        id: "ui_renderer",
+        title: "Renderer (ANSI/terminal)",
+        desc: "Podstawowy silnik renderujący tekst na terminalu z escape kodami.",
+        done: true,
+        hint: `Używasz sekwencji ANSI do rysowania. Warto wprowadzić <em>double buffering</em> — zapisujesz nowy stan, diff-ujesz ze starym i wysyłasz tylko zmiany.<br><br>
+📖 <a href="https://viewsourcecode.org/snaptoken/kilo/" target="_blank">Build Your Own Text Editor (kilo tutorial)</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "ui_statusbar",
+        title: "Status bar",
+        desc: "Dolny pasek z trybem, nazwą pliku, pozycją kursora.",
+        done: true,
+        hint: `Status bar powinien reagować na zmianę trybu (Normal/Insert/Visual) i pokazywać np. <code>INSERT -- 42:10</code>.<br>
+Opcjonalnie: modułowy — każda sekcja to osobna klasa.`,
+        difficulty: "easy"
+      },
+      {
+        id: "ui_commandline",
+        title: "Command-line bar (ex commands)",
+        desc: "Dolna linia do wpisywania poleceń jak :w, :q, :set itp.",
+        done: false,
+        hint: `W Vimie ':' otwiera <em>command-line mode</em>. Możesz użyć istniejącego <code>PromptService</code> i rozbudować go o parsowanie poleceń ex.<br><br>
+📖 <a href="https://vimhelp.org/cmdline.txt.html" target="_blank">Vim – cmdline.txt</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "ui_button",
+        title: "Abstrakcja widgetów (Button, InputBox, Menu)",
+        desc: "Klasy bazowe dla interaktywnych elementów UI (jeśli planujesz TUI).",
+        done: false,
+        hint: `Przykładowe biblioteki TUI w C++: <a href="https://github.com/ArthurSonzogni/FTXUI" target="_blank">FTXUI</a> (deklaratywne, świetne do komponentów).<br>
+Możesz też własnoręcznie zdefiniować <code>IWidget</code> z metodami <code>render()</code> i <code>handle_key(Key)</code>.`,
+        difficulty: "medium"
+      },
+      {
+        id: "ui_theme",
+        title: "System motywów / kolorów",
+        desc: "Centralna konfiguracja palet kolorów, ładowanie z pliku.",
+        done: false,
+        hint: `Obecnie używasz <code>ansi_theme.hpp</code>. Następny krok: mapa <code>TokenType → Color</code> ładowana z pliku JSON/TOML.<br><br>
+📖 <a href="https://github.com/nickel-lang/nickel" target="_blank">TextMate grammar format (inspiracja dla tokenów)</a><br>
+Format pliku: <a href="https://toml.io" target="_blank">TOML</a> jest czytelniejszy niż JSON dla konfigów.`,
+        difficulty: "easy"
+      }
+    ]
+  },
+  {
+    id: "buffers",
+    icon: "📄",
+    title: "Multiple Buffers",
+    items: [
+      {
+        id: "buffers_manager",
+        title: "BufferManager – zarządzanie wieloma buforami",
+        desc: "Lista otwartych buforów, przełączanie między nimi (:bn, :bp, :b<n>).",
+        done: false,
+        hint: `Bufor = para (Document + metadane: nazwa pliku, dirty flag, id).<br>
+<code>BufferManager</code> trzyma <code>std::vector&lt;Buffer&gt;</code> i aktywny indeks.<br><br>
+📖 <a href="https://vimhelp.org/windows.txt.html#buffers" target="_blank">Vim – buffers (windows.txt)</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "buffers_list",
+        title: "Buffer list UI (:ls / :buffers)",
+        desc: "Wyświetlanie listy otwartych buforów z flagami (aktywny, zmodyfikowany).",
+        done: false,
+        hint: `Flagi Vima: <code>%a</code> = aktywny, <code>+</code> = niezapisany, <code>-</code> = unlisted.<br>
+Możesz wyrenderować to jako tymczasowe okno (scratch buffer) lub w status barze.`,
+        difficulty: "easy"
+      },
+      {
+        id: "buffers_alternate",
+        title: "Alternate buffer (Ctrl-^)",
+        desc: "Szybki powrót do poprzednio aktywnego bufora.",
+        done: false,
+        hint: `Wystarczy trzymać <code>prev_buffer_id</code> w <code>BufferManager</code>. Przy każdym przełączeniu aktualizuj poprzedni.`,
+        difficulty: "easy"
+      }
+    ]
+  },
+  {
+    id: "windows",
+    icon: "⬜",
+    title: "Window Splits (vsplit / hsplit)",
+    items: [
+      {
+        id: "windows_model",
+        title: "Model drzewa okien (WindowTree)",
+        desc: "Rekurencywna struktura podziałów: korzeń → węzły VSplit/HSplit → liście (okna).",
+        done: false,
+        hint: `Klasyczna implementacja: drzewo binarne gdzie każdy węzeł to albo <em>split</em> (z dziećmi + proporcją) albo <em>leaf</em> (okno).<br><br>
+📖 <a href="https://vimhelp.org/windows.txt.html" target="_blank">Vim – windows.txt</a><br>
+📖 <a href="https://github.com/nicowillis/vsplit_model" target="_blank">Przykład prostego drzewa podziałów</a>`,
+        difficulty: "hard"
+      },
+      {
+        id: "windows_vsplit",
+        title: "Vertical split (:vsplit / Ctrl-W v)",
+        desc: "Podział ekranu pionowo — każda połowa ma własny viewport i kursor.",
+        done: false,
+        hint: `Każde okno to <code>Window { buffer_id, Viewport, Cursor }</code>.<br>
+<code>WindowTree</code> liczy wymiary każdego liścia i przekazuje je do <code>Renderer</code>.<br>
+Renderuj okno po oknie, pilnując offsetów X/Y.`,
+        difficulty: "hard"
+      },
+      {
+        id: "windows_hsplit",
+        title: "Horizontal split (:split / Ctrl-W s)",
+        desc: "Podział ekranu poziomo.",
+        done: false,
+        hint: `Analogicznie do vsplit — zmienia się tylko oś podziału. Warto od razu napisać generyczną klasę <code>Split(axis, ratio, left, right)</code>.`,
+        difficulty: "hard"
+      },
+      {
+        id: "windows_navigation",
+        title: "Nawigacja między oknami (Ctrl-W h/j/k/l)",
+        desc: "Przeskakiwanie focusu między oknami zgodnie z kierunkiem.",
+        done: false,
+        hint: `Potrzebujesz funkcji znajdowania sąsiada w drzewie w danym kierunku.<br>
+Uproszczone podejście: spłaszczona lista okien posortowana geometrycznie — znajdź najbliższe w kierunku ruchu.`,
+        difficulty: "medium"
+      },
+      {
+        id: "windows_resize",
+        title: "Zmiana rozmiaru okien (Ctrl-W +/-/</>)",
+        desc: "Dynamiczna zmiana proporcji splitów.",
+        done: false,
+        hint: `Każdy węzeł split trzyma <code>ratio</code> (float 0–1). <code>Ctrl-W +</code> zwiększa ratio aktywnego okna o np. 0.05.<br>
+Pamiętaj o minimalnej szerokości/wysokości okna (np. 8 kolumn).`,
+        difficulty: "medium"
+      }
+    ]
+  },
+  {
+    id: "file_manager",
+    icon: "📁",
+    title: "File Manager",
+    items: [
+      {
+        id: "fm_tree",
+        title: "Drzewo plików (file tree / netrw-style)",
+        desc: "Panel boczny z katalogiem projektu, nawigacja klawiaturą.",
+        done: false,
+        hint: `Minimalny file tree: lista pliku bieżącego katalogu z wcięciami dla podkatalogów.<br>
+<code>std::filesystem::directory_iterator</code> (C++17) — masz już C++17 w projekcie!<br><br>
+📖 <a href="https://en.cppreference.com/w/cpp/filesystem" target="_blank">cppreference – std::filesystem</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "fm_fuzzy",
+        title: "Fuzzy finder (ala Ctrl-P / Telescope)",
+        desc: "Szybkie otwieranie pliku przez rozmyte dopasowanie nazwy.",
+        done: false,
+        hint: `Algorytm: <em>subsequence matching</em> + scoring (bonus za początki słów, ciągłe dopasowania).<br><br>
+📖 <a href="https://github.com/jhawthorn/fzy" target="_blank">fzy – prosta implementacja fuzzy (C, czytelna)</a><br>
+📖 <a href="https://github.com/nvim-telescope/telescope.nvim" target="_blank">Telescope.nvim – inspiracja UX</a>`,
+        difficulty: "hard"
+      },
+      {
+        id: "fm_operations",
+        title: "Operacje na plikach (rename, delete, new file)",
+        desc: "Podstawowe zarządzanie plikami z poziomu edytora.",
+        done: false,
+        hint: `Użyj <code>std::filesystem::rename</code>, <code>std::filesystem::remove</code>.<br>
+Przed usunięciem pokaż prompt potwierdzający — masz już <code>PromptService</code>!`,
+        difficulty: "easy"
+      }
+    ]
+  },
+  {
+    id: "modes",
+    icon: "⌨️",
+    title: "Tryby edytora (Vim-like)",
+    items: [
+      {
+        id: "modes_normal",
+        title: "Normal mode – podstawowe ruchy",
+        desc: "h/j/k/l, w/b/e, 0/$/gg/G, motions z licznikiem (3w, 5j).",
+        done: true,
+        hint: `Ruch z licznikiem: parser <code>[count][motion]</code> — trzymaj tymczasowy bufor cyfr przed każdym ruchem.<br>
+📖 <a href="https://vimhelp.org/motion.txt.html" target="_blank">Vim – motion.txt</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "modes_insert",
+        title: "Insert mode",
+        desc: "Podstawowe wpisywanie znaków, Escape do Normal.",
+        done: true,
+        hint: `Warto obsłużyć <code>Ctrl-W</code> (usuń słowo wstecz) i <code>Ctrl-U</code> (usuń do początku linii) już w Insert mode.`,
+        difficulty: "easy"
+      },
+      {
+        id: "modes_visual",
+        title: "Visual mode (v / V / Ctrl-V)",
+        desc: "Zaznaczanie znaków, linii i bloków prostokątnych.",
+        done: false,
+        hint: `Visual mode trzyma <code>anchor</code> (punkt startu) i <code>cursor</code> (punkt końca).<br>
+Visual Block (<code>Ctrl-V</code>) to najtrudniejszy wariant — wymaga edycji wielu linii jednocześnie.<br><br>
+📖 <a href="https://vimhelp.org/visual.txt.html" target="_blank">Vim – visual.txt</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "modes_operators",
+        title: "Operatory (d, c, y) + text objects",
+        desc: "dw, ciw, ya}, d3j — kombinacje operatora, licznika i ruchu/obiektu.",
+        done: false,
+        hint: `Architektura: <code>operator × motion = action</code>.<br>
+Text objects: <code>iw, aw, i(, a[</code> itd. — to oddzielny podsystem parsowania.<br><br>
+📖 <a href="https://vimhelp.org/motion.txt.html#object-select" target="_blank">Vim – text objects</a><br>
+📖 <a href="https://github.com/helix-editor/helix" target="_blank">Helix editor – nowoczesna implementacja, dobry kod do czytania</a>`,
+        difficulty: "hard"
+      },
+      {
+        id: "modes_registers",
+        title: "Rejestry (\"a-z, \"+, \"_, \"0)",
+        desc: "Named registers, clipboard register, black hole register, yank register.",
+        done: false,
+        hint: `Trzymaj <code>std::unordered_map&lt;char, std::string&gt;</code> dla rejestrów.<br>
+Rejestr <code>+</code> = clipboard systemowy — wymaga integracji z <code>xclip</code>/<code>wl-copy</code> lub OSC 52 escape.`,
+        difficulty: "medium"
+      }
+    ]
+  },
+  {
+    id: "syntax",
+    icon: "🌈",
+    title: "Syntax Highlighting",
+    items: [
+      {
+        id: "syntax_hldb",
+        title: "Baza danych syntax (HLDB)",
+        desc: "Regex-based highlighting z detekcją języka po rozszerzeniu.",
+        done: true,
+        hint: `Masz już działający system. Następny krok: wsparcie dla większej liczby języków (Python, Rust, JS).`,
+        difficulty: "easy"
+      },
+      {
+        id: "syntax_treesitter",
+        title: "Tree-sitter integration",
+        desc: "Prawdziwy parser AST dla dokładniejszego podświetlania.",
+        done: false,
+        hint: `Tree-sitter daje podświetlanie na poziomie AST — poprawna obsługa stringów wieloliniowych, zagnieżdżonych struktur itp.<br><br>
+📖 <a href="https://tree-sitter.github.io/tree-sitter/" target="_blank">Tree-sitter – oficjalna dokumentacja</a><br>
+📖 <a href="https://github.com/nicowillis/tree-sitter-cpp-example" target="_blank">Przykład bindingów C++</a>`,
+        difficulty: "hard"
+      },
+      {
+        id: "syntax_lsp",
+        title: "LSP client (Language Server Protocol)",
+        desc: "Autouzupełnianie, go-to-definition, diagnostyka błędów w czasie rzeczywistym.",
+        done: false,
+        hint: `LSP komunikuje się przez JSON-RPC (stdin/stdout lub socket).<br>
+Minimalne MVP: <code>initialize</code> → <code>textDocument/didOpen</code> → <code>textDocument/completion</code>.<br><br>
+📖 <a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/" target="_blank">LSP 3.17 Specification</a><br>
+📖 <a href="https://github.com/nicowillis/lsp-client-cpp" target="_blank">Minimalny klient LSP w C++</a>`,
+        difficulty: "hard"
+      }
+    ]
+  },
+  {
+    id: "config",
+    icon: "⚙️",
+    title: "Konfiguracja i skrypty",
+    items: [
+      {
+        id: "config_file",
+        title: "Plik konfiguracyjny (~/.editrrrc lub init.lua)",
+        desc: "Ładowanie ustawień (tab width, line numbers, theme) z pliku.",
+        done: false,
+        hint: `Prosty format: pary <code>key = value</code> lub TOML.<br>
+Bardziej zaawansowane: Lua scripting (jak Neovim) — biblioteka <a href="https://www.lua.org/manual/5.4/" target="_blank">Lua 5.4</a> jest embedowalna w C++.`,
+        difficulty: "medium"
+      },
+      {
+        id: "config_keymaps",
+        title: "Mapowania klawiszy (keymaps)",
+        desc: "Możliwość rekonfiguracji klawiszy z pliku konfiguracyjnego.",
+        done: false,
+        hint: `Obecny <code>Dispatcher</code> łączy klawisz z komendą statycznie. Wystarczy zrobić tę mapę dynamiczną i ładować ją z pliku.<br>
+Format: <code>nmap &lt;C-s&gt; :w&lt;CR&gt;</code> — patrz jak to robi Vim.`,
+        difficulty: "medium"
+      },
+      {
+        id: "config_macros",
+        title: "Makra (q{a} ... @{a})",
+        desc: "Nagrywanie i odtwarzanie sekwencji klawiszy.",
+        done: false,
+        hint: `Makro = sekwencja klawiszy zapisana w rejestrze. Odtwarzanie = wstrzyknięcie klawiszy do kolejki inputowej.<br>
+Potrzebujesz modyfikowalnej kolejki zdarzeń klawiszowych.`,
+        difficulty: "medium"
+      }
+    ]
+  },
+  {
+    id: "search",
+    icon: "🔍",
+    title: "Wyszukiwanie i nawigacja",
+    items: [
+      {
+        id: "search_basic",
+        title: "Wyszukiwanie (/pattern, n/N)",
+        desc: "Regex search w dokumencie z podświetlaniem wyników.",
+        done: true,
+        hint: `Masz <code>SearchService</code>. Następny krok: podświetlanie wszystkich dopasowań jednocześnie (highlight matches).`,
+        difficulty: "easy"
+      },
+      {
+        id: "search_replace",
+        title: "Wyszukaj i zamień (:%s/foo/bar/g)",
+        desc: "Zamiana wzorca w dokumencie (zakres, flagi g/c/i).",
+        done: false,
+        hint: `Parser ex: <code>:s/pattern/replacement/flags</code> na bieżącej linii, <code>:%s</code> w całym pliku.<br>
+Flaga <code>/c</code> (confirm) wymaga interakcji po każdym dopasowaniu.`,
+        difficulty: "medium"
+      },
+      {
+        id: "search_grep",
+        title: "Grep w projekcie (:grep / :vimgrep)",
+        desc: "Wyszukiwanie wzorca w wielu plikach, quickfix list.",
+        done: false,
+        hint: `Możesz wywołać zewnętrzny <code>grep</code>/<code>rg</code> i sparsować wyniki do <em>quickfix listy</em>.<br><br>
+📖 <a href="https://vimhelp.org/quickfix.txt.html" target="_blank">Vim – quickfix.txt</a>`,
+        difficulty: "medium"
+      },
+      {
+        id: "search_marks",
+        title: "Znaczniki (ma, 'a, '', mx)",
+        desc: "Zapisywanie i powrót do pozycji w pliku.",
+        done: false,
+        hint: `Trzymaj <code>std::unordered_map&lt;char, Position&gt;</code>. Znaki <code>a-z</code> lokalne do pliku, <code>A-Z</code> globalne.`,
+        difficulty: "easy"
+      }
+    ]
+  }
+];
+
+// ─── Stan ─────────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'editrr_roadmap_v1';
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch { return {}; }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+// Ustaw domyślny stan (done=true) dla pozycji oznaczonych jako zaimplementowane
+ROADMAP.forEach(cat => {
+  cat.items.forEach(item => {
+    if (!(item.id in state) && item.done) {
+      state[item.id] = true;
+    }
+  });
+});
+saveState(state);
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function calcProgress() {
+  let total = 0, done = 0;
+  ROADMAP.forEach(cat => {
+    cat.items.forEach(item => {
+      total++;
+      if (state[item.id]) done++;
+    });
+  });
+  return { total, done, pct: total ? Math.round(done / total * 100) : 0 };
+}
+
+function calcCatProgress(cat) {
+  let total = cat.items.length, done = 0;
+  cat.items.forEach(item => { if (state[item.id]) done++; });
+  return { total, done, pct: total ? Math.round(done / total * 100) : 0 };
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+
+function difficultyTag(d) {
+  const map = { easy: ['easy','Łatwe'], medium: ['medium','Średnie'], hard: ['hard','Trudne'] };
+  const [cls, label] = map[d] || ['easy',''];
+  return `<span class="tag tag-${cls}">${label}</span>`;
+}
+
+function renderItem(item) {
+  const checked = !!state[item.id];
+  return `
+    <div class="item" id="item-${item.id}">
+      <div class="item-row">
+        <div class="item-check ${checked ? 'checked' : ''}"
+             onclick="toggleItem('${item.id}')"
+             title="Oznacz jako zrobione"></div>
+        <div class="item-body">
+          <div class="item-title ${checked ? 'checked-label' : ''}" onclick="toggleItem('${item.id}')">
+            ${item.title}${difficultyTag(item.difficulty)}
+          </div>
+          ${item.desc ? `<div class="item-desc">${item.desc}</div>` : ''}
+          ${item.hint ? `
+            <span class="hint-toggle" onclick="toggleHint('${item.id}')">
+              💡 Pokaż podpowiedź
+            </span>
+            <div class="hint-box" id="hint-${item.id}">${item.hint}</div>
+          ` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderCategory(cat) {
+  const prog = calcCatProgress(cat);
+  const isOpen = cat.id === 'gap_buffer' || cat.id === 'ui'; // domyślnie otwarte
+  return `
+    <div class="category ${isOpen ? 'open' : ''}" id="cat-${cat.id}">
+      <div class="category-header" onclick="toggleCat('${cat.id}')">
+        <span class="icon">${cat.icon}</span>
+        <span class="cat-title">${cat.title}</span>
+        <span class="cat-progress">
+          <span id="cat-done-${cat.id}">${prog.done}</span>/${prog.total}
+          <span class="cat-percent" id="cat-pct-${cat.id}">${prog.pct}%</span>
+          <span class="mini-bar">
+            <span class="mini-bar-fill" id="cat-bar-${cat.id}" style="width:${prog.pct}%"></span>
+          </span>
+        </span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="items">
+        ${cat.items.map(renderItem).join('')}
+      </div>
+    </div>`;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = ROADMAP.map(renderCategory).join('');
+  updateGlobal();
+}
+
+function updateGlobal() {
+  const { total, done, pct } = calcProgress();
+  document.getElementById('global-percent').textContent = pct + '%';
+  document.getElementById('global-bar').style.width = pct + '%';
+  document.getElementById('header-progress').textContent = `${done} / ${total} ukończone`;
+}
+
+function updateCategory(catId) {
+  const cat = ROADMAP.find(c => c.id === catId);
+  if (!cat) return;
+  const prog = calcCatProgress(cat);
+  document.getElementById(`cat-done-${catId}`).textContent = prog.done;
+  document.getElementById(`cat-pct-${catId}`).textContent = prog.pct + '%';
+  document.getElementById(`cat-bar-${catId}`).style.width = prog.pct + '%';
+}
+
+// ─── Akcje ────────────────────────────────────────────────────────────────────
+
+function toggleItem(id) {
+  state[id] = !state[id];
+  saveState(state);
+
+  const check = document.querySelector(`#item-${id} .item-check`);
+  const label = document.querySelector(`#item-${id} .item-title`);
+  check.classList.toggle('checked', !!state[id]);
+  label.classList.toggle('checked-label', !!state[id]);
+
+  const catId = ROADMAP.find(c => c.items.some(i => i.id === id))?.id;
+  if (catId) updateCategory(catId);
+  updateGlobal();
+}
+
+function toggleHint(id) {
+  const box = document.getElementById(`hint-${id}`);
+  const toggle = box.previousElementSibling;
+  const visible = box.classList.toggle('visible');
+  toggle.textContent = visible ? '🔼 Ukryj podpowiedź' : '💡 Pokaż podpowiedź';
+}
+
+function toggleCat(id) {
+  const el = document.getElementById(`cat-${id}`);
+  el.classList.toggle('open');
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

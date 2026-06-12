@@ -9,6 +9,8 @@
 #include <cstring>
 #include <ctime>
 
+#include "editrr/config/config.hpp"
+
 namespace editrr {
 
 static int get_window_size(int& rows, int& cols) {
@@ -43,8 +45,7 @@ void EditorState::on_row_changed(int row_idx) {
 }
 
 void EditorState::rehighlight_all() {
-  for (int i = 0; i < doc.num_rows(); ++i)
-    Document::rebuild_render(doc.row(i), doc.row_text(i));
+  for (int i = 0; i < doc.num_rows(); ++i) Document::rebuild_render(doc.row(i), doc.row_text(i));
   if (!syntax) return;
   syntax->set_filename(doc.filename());
   syntax->highlight_from(doc, 0);
@@ -197,15 +198,13 @@ void EditorApp::process_key(EditorState& state, EditorServices& svc, const Key& 
   if (auto cmd = dispatcher_.map_key_to_command(k)) {
     cmd->execute(state, svc);
   }
-  // quit_times reset przy każdej "normalnej" akcji
-  // (QuitCmd sam zarządza swoim licznikiem więc tu nie trzeba nic)
 }
 
 void EditorApp::run(const std::string& path) {
   EditorState state;
   state.syntax = make_default_highlighter();
   state.set_status("HELP: Ctrl-Q quit | Ctrl-S save | Ctrl-F find");
-
+  state.set_status(("Config path:" + config::AppConfig::get_config_path().string()).c_str());
   EditorServices svc;
   svc.input = &input_;
   svc.renderer = &renderer_;

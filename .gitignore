@@ -1,10 +1,13 @@
 build/
 logs/
 .vscode/
-
+.idea/
+.cache/
 # pixi environments
 .pixi/*
 !.pixi/config.toml
 
-# Bazel
-bazel-*
+bazel*
+
+# Conan
+.conan/

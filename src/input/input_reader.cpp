@@ -25,14 +25,13 @@ namespace editrr {
         static constexpr KeyCode kTextCode = static_cast<KeyCode>(0);
 
         static bool is_final_csi(char c) {
-            // final byte CSI to najczęściej litera lub '~'
             return (c >= '@' && c <= '~'); // standard CSI final range
         }
 
         struct CsiInfo {
-            char final{ 0 };       // np. 'A','B','C','D','H','F','~'
-            int p1{ 0 };           // pierwsza liczba (np. 1 w "1;5A", albo 3 w "3~")
-            int p2{ 0 };           // druga liczba (np. 5 w "1;5A")
+            char final{ 0 };
+            int p1{ 0 };
+            int p2{ 0 };
             bool ctrl{ false };
             bool alt{ false };
             bool shift{ false };
