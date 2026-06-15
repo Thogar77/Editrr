@@ -12,6 +12,3 @@ class IConfig {
   virtual void load() = 0;
   virtual void update() = 0;
 };
-
-struct KeyBindings
-{};

@@ -6,10 +6,9 @@
 #define EDITRR_TOML_SERIALIZER_H
 #include <filesystem>
 #include <string>
-#include <toml/toml.hpp>
+#include <toml++/toml.hpp>
 
 #include "ISerializer.hpp"
-#include "toml++/impl/table.hpp"
 namespace serializer {
 class TomlSerializer : ISerializer {
  public:

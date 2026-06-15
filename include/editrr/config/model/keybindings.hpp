@@ -4,21 +4,17 @@
 
 #ifndef EDITRR_KEYBINDINGS_H
 #define EDITRR_KEYBINDINGS_H
-#include <unordered_map>
-#include <string>
 #include <magic_enum/magic_enum.hpp>
+#include <string>
+#include <unordered_map>
+
 #include "editrr/commands/command.hpp"
-namespace editrr {
-class Keybindings {
-public:
-  char get_command_key(const Command& command);
-  bool load();
-private:
-  std::unordered_map<Command, char> Keybinding {
-      {Command::Quit, 'q'},
-      {Command::Save, 's'},
-      {Command::Find, 'f'}
-  } ;
+#include "toml++/impl/table.hpp"
+namespace config {
+struct Keybindings {
+  std::unordered_map<editrr::Command, char> commands{
+      {editrr::Command::Quit, 'q'}, {editrr::Command::Save, 's'}, {editrr::Command::Find, 'f'}};
 };
-}
+toml::table keybindings_to_toml(Keybindings keybindings);
+}  // namespace config
 #endif  // EDITRR_KEYBINDINGS_H
