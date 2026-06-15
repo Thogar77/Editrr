@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "editrr/app/editor_app.hpp"
-#include "editrr/config/config.hpp"
+#include "editrr/config/app_config.hpp"
 
 namespace editrr {
 

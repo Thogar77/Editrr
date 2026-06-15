@@ -4,8 +4,10 @@
 #include <string>
 
 #include "editrr/config/types/types.hpp"
+#include "editrr/config/serializer/toml_serializer.h"
+#include "editrr/config/model/keybindings.hpp"
+#include "editrr/config/model/editor_settings.hpp"
 namespace config {
-enum class Keybinding : char { QUIT = 'q', SAVE = 's', FIND = 'f' };
 
 inline std::array<std::string, 1> configs{"keybindings"};
 class AppConfig : public IConfig {
@@ -22,5 +24,7 @@ class AppConfig : public IConfig {
   void create_default_config_file();
   static std::filesystem::path _config_path;
   static AppConfig* _instance;
+  KeyBindings _keybindings;
+  editrr::EditorSettings _editor_settings;
 };
 }  // namespace config

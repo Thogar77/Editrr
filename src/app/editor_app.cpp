@@ -9,7 +9,7 @@
 #include <cstring>
 #include <ctime>
 
-#include "editrr/config/config.hpp"
+#include "editrr/config/app_config.hpp"
 
 namespace editrr {
 

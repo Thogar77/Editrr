@@ -45,11 +45,18 @@ add_executable(editrr
         src/services/syntax/syntax_hldb.cpp
         src/config/parser/parser.cpp
         src/config/parser/parser.cpp
-        src/config/config.cpp
+        src/config/app_config.cpp
         include/editrr/config/serializer/ISerializer.hpp
         include/editrr/config/serializer/toml_serializer.h
         include/editrr/config/config_data.h
         src/config/serializer/toml_serializer.cpp
+        src/config/app_config.cpp
+        src/config/app_config.cpp
+        include/editrr/config/model/keybindings.hpp
+        include/editrr/config/model/keybindings.hpp
+        include/editrr/config/model/editor_settings.hpp
+        include/editrr/config/model/fonts.hpp
+        include/editrr/config/exceptions/exceptions.hpp
 )
 
 target_include_directories(editrr
