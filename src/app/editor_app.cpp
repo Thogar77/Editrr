@@ -204,6 +204,7 @@ void EditorApp::run(const std::string& path) {
   EditorState state;
   state.syntax = make_default_highlighter();
   state.set_status("HELP: Ctrl-Q quit | Ctrl-S save | Ctrl-F find");
+  auto cfg = config::AppConfig::instance();
   state.set_status(("Config path:" + config::AppConfig::get_config_path().string()).c_str());
   EditorServices svc;
   svc.input = &input_;

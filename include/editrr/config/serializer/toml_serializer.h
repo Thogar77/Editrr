@@ -12,7 +12,7 @@
 namespace serializer {
 class TomlSerializer : ISerializer {
  public:
-  TomlSerializer();
+  TomlSerializer() = default;
   virtual ~TomlSerializer() = default;
   void serialize(const toml::table& data, const std::filesystem::path& file_path) override;
 };

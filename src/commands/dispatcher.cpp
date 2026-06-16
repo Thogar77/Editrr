@@ -101,12 +101,15 @@ struct EnterCmd : ICommand {
     state.quit_times = 3;
   }
 };
+Dispatcher::Dispatcher() { cfg = config::AppConfig::instance(); };
 
 std::unique_ptr<ICommand> Dispatcher::map_key_to_command(const Key& k) {
   // ===== Ctrl-klawisze =====
-  if (k.ctrl && k.ch == char(config::Keybinding::QUIT)) return std::make_unique<QuitCmd>();
-  if (k.ctrl && k.ch == char(config::Keybinding::SAVE)) return std::make_unique<SaveCmd>();
-  if (k.ctrl && k.ch == char(config::Keybinding::FIND)) return std::make_unique<FindCmd>();
+  if (k.ctrl && k.ch == cfg->_keybindings.commands[Command::Quit])
+    return std::make_unique<QuitCmd>();
+  if (k.ctrl && k.ch == cfg->_keybindings.commands[Command::Save])
+    return std::make_unique<SaveCmd>();
+  if (k.ctrl && k.ch == cfg->_keybindings.commands[Command::Find]) std::make_unique<FindCmd>();
 
   // ===== Specjalne klawisze =====
   if (k.code == KeyCode::Enter) return std::make_unique<EnterCmd>();

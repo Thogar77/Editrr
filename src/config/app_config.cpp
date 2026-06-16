@@ -1,7 +1,7 @@
+#include "editrr/config/app_config.hpp"
+
 #include <filesystem>
 #include <iostream>
-
-#include "editrr/config/app_config.hpp"
 
 namespace config {
 
@@ -11,7 +11,7 @@ std::filesystem::path AppConfig::_config_path =
 
 AppConfig::AppConfig() {
   _serializer = serializer::TomlSerializer();
-  if (std::filesystem::exists(_config_path)) {
+  if (!std::filesystem::exists(_config_path / "config.toml")) {
     create_default_config_file();
   }
 }
@@ -38,6 +38,10 @@ void AppConfig::create_default_config_file() {
   if (std::filesystem::exists(_config_path / "config.toml")) {
     return;
   }
-
+  if (!std::filesystem::exists(_config_path)) {
+    std::filesystem::create_directories(_config_path);
+  }
+  auto keybinds = keybindings_to_toml(_keybindings);
+  _serializer.serialize(keybinds, _config_path / "config.toml");
 }
 }  // namespace config

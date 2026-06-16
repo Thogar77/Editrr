@@ -19,6 +19,7 @@ class AppConfig : public IConfig {
 
   static bool set_config_path(const std::filesystem::path& path);
   static std::filesystem::path get_config_path() { return _config_path; };
+  Keybindings _keybindings;
 
  private:
   AppConfig();
@@ -26,7 +27,6 @@ class AppConfig : public IConfig {
   static std::filesystem::path _config_path;
   static AppConfig* _instance;
   serializer::TomlSerializer _serializer;
-  Keybindings _keybindings;
   EditorSettings _editor_settings;
 };
 }  // namespace config
